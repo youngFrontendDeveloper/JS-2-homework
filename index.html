@@ -13,9 +13,10 @@
         <a href="#"><img src="img/logo_baby.jpg" alt="" width="318" height="80"></a>
       </div>
       <a href="#cart-popup" class="cart-button">
-        <svg class="icon-card">
+        <img src="img/cart.png" alt="Корзина">
+        <!-- <svg class="icon-card">
           <use xlink:href="img/sprite.svg#card"></use>
-        </svg>
+        </svg> -->
       </a>
     </div> <!-- end container -->
   </header>
@@ -30,15 +31,16 @@
     <!-- <div class="cart-popup__body"> -->
     <div class="cart-popup__content">
       <div class="cart-popup__close">
-        <svg class="cart-popup__btn-close">
+        <img src="img/close_x.png" alt="Закрыть модальное окно">
+        <!-- <svg class="cart-popup__btn-close">
           <use xlink:href="img/sprite.svg#close-black"></use>
-        </svg>
+        </svg> -->
       </div>
       <h3 class="cart-popup__title">Моя корзина товаров</h3>
-      <p class="cart-popup__text">Товаров: <span class="cart-popup__text-bold"></span></p>
-      <p class="cart-popup__text">на сумму: <span class="cart-popup__text-bold"></span></p>
-      <ul class="cart-popup__list">
-        <li class="cart-popup__list-item">
+      <p class="cart-popup__text">Товаров: <span class="cart-popup__text-bold" id="countGoods"></span></p>
+      <p class="cart-popup__text">на сумму: <span class="cart-popup__text-bold" id="amount"></span></p>
+      <!-- <ul class="cart-popup__list"> -->
+        <!-- <li class="cart-popup__list-item">
           <img src="img/good-1.jpg" alt="Изображение товара">
         </li>
         <li class="cart-popup__list-item">Платье</li>
@@ -47,8 +49,8 @@
         <li class="cart-popup__list-item">150 руб.</li>
         <li class="cart-popup__list-item cart-popup__list-item--delete" title="Удалить товар">
           <img class="cart-popup__delete" src="img/delete-from-cart.ico" alt="Удалить товар">
-        </li>
-      </ul>
+        </li> -->
+      <!-- </ul> -->
       <button class="cart-popup__btn-buy">Оформить заказ</button>
     </div> <!-- end cart-popup__content-->
     <!-- </div> -->

@@ -1,14 +1,52 @@
 'use strict';
 
+const API = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses';
+
+
+
+//Конструктор для создания списка товаров на странице
+
+class GoodsList {
+  constructor(container = '.products') {
+    this.container = container;
+    this.goods = [];
+    this.allProducts = [];
+    this._makeGETRequest()
+      .then(data => {
+        this.goods = [...data];
+        this.render();
+      });
+  }
+
+  _makeGETRequest() {
+    return fetch(`${API}/catalogData.json`)
+      .then(result => result.json())
+      .catch(error => {
+        console.log(error);
+      });
+  }
+  render() {
+    const block = document.querySelector(this.container);
+    for (let product of this.goods) {
+      const productObj = new GoodsItem(product);
+      this.allProducts.push(productObj);
+      block.insertAdjacentHTML('beforeend', productObj.render());
+    }
+  }
+}
+
+
+
 //Конструктор для создания товара на странице
-class ProductItem {
+class GoodsItem {
   constructor(product, img = 'img/noimage.jpg', title = 'Product Name', price = 'Is unknown') {
+    this.id = product.id_product;
     this.img = product.img || img;
-    this.title = product.title || title;
+    this.title = product.product_name || title;
     this.price = product.price || price;
   }
   render() {
-    return `<div class='products__item'>
+    return `<div class='products__item' data-id="${this.id}">
             <img src=${this.img} class='products__item-img' alt='Изображение товара'>
             <h3 class='products__item-title'>${this.title}</h3>
             <p class='products__item-text'>${this.price} rub.</p>
@@ -17,139 +55,95 @@ class ProductItem {
   }
 }
 
-//Конструктор для создания списка товаров на странице
+let list = new GoodsList();
 
-class ProductsList {
-  constructor(container = '.products') {
-    this.container = container;
-    this.goods = [{
-        img: 'img/good-1.jpg',
-        title: 'Shirt',
-        price: 150
-      },
-      {
-        img: 'img/good-2.jpg',
-        title: 'Socks',
-        price: 50
-      },
-      {
-        img: 'img/good-3.jpg',
-        title: 'Jacket',
-        price: 350
-      },
-      {
-        img: 'img/good-4.jpg',
-        title: 'Shoes',
-        price: 250
-      },
-    ];
-  }
-  render() {
-    const block = document.querySelector(this.container);
-    for (let product of this.goods) {
-      const productItem = new ProductItem(product);
-      block.insertAdjacentHTML('beforeend', productItem.render());
-    }
-  }
-  calculateAmountOfProduct() { //Подсчет общей суммы всех продуктов на странице
-    // Первый вариант
-    // let amount = 0;
-    // for (let product of this.goods) {
-    //   amount += product.price;
-    // }
-
-    // Второй вариант
-    let res = this.goods.reduce((sum, item) => sum += item.price, 0);
-    console.log(res);
-  }
-
-}
-
-let list = new ProductsList();
-list.render();
-list.calculateAmountOfProduct();
-
-
-//Конструктор для создания элемента корзины 
-
-class CartItem {
-  constructor(product) {
-    this.img = product.img;
-    this.title = product.title;
-    this.price = product.price;
-  }
-
-  increaseProductQuantity() {} // Увеличить количество товара
-
-  reduceProductQuantity() {} // Уменьшить количество товара
-
-  delite() {} //Удалить товар из корзины
-
-  recalculateAmountOfProduct() {} // Пересчитать сумму товара, в зависимости от количества
-
-}
 
 //Конструктор для создания корзины 
 
-class Cart {
+class CartList {
 
-  constructor() {
+  constructor(container = '.cart-popup__content') {
+    this.container = container;
+    this.goods = [];
 
+    this.allProducts = [];
+    this._makeGETRequest()
+      .then(data => {
+        this.goods = [...data.contents];
+        this.amount = data.amount;
+        this.countGoods = data.countGoods;
+        this.render();
+      });
+  }
+
+  _makeGETRequest() {
+    return fetch(`${API}/getBasket.json`)
+      .then(result => result.json())
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  render() {
+    const block = document.querySelector(this.container);
+    const countGoods = document.querySelector('#countGoods');
+    const amount = document.querySelector('#amount');
+    for (let product of this.goods) {
+      const cartObj = new CartItem(product);
+      this.allProducts.push(cartObj);
+      block.insertAdjacentHTML('beforeend', cartObj.render());
+    }
+    countGoods.insertAdjacentHTML('beforeend', this.countGoods)
+    amount.insertAdjacentHTML('beforeend', `${this.amount} руб.`);
   }
 
   recalculateAmountOfProducts() {} //  Пересчитать общую сумму всех товаров
 
   placeOrder() {} // Оформить заказ
 
+  delite() {} //Удалить товар из корзины
+
 }
 
 
-// Расчет стоимости и калорийности гамбургера
+//Конструктор для создания элемента корзины 
 
-class Hamburger {
-  constructor(size, filling, seasoning, mayonnaise) {
-    this.size = size;
-    this.filling = filling;
-    this.seasoning = seasoning || false;
-    this.mayonnaise = mayonnaise || false;
+class CartItem {
+  constructor(product, img = 'img/noimage.jpg', title = 'Product Name', price = 'Is unknown', quantity = 1) {
+    this.id = product.id_product;
+    this.img = product.img || img;
+    this.title = product.product_name || title;
+    this.price = product.price || price;
+    this.quantity = product.quantity || quantity;
   }
-  calc() {
-    let cost = 0;
-    let calories = 0;
-    if (this.size == 'big') {
-      cost += 100;
-      calories += 40;
-    } else {
-      cost += 50;
-      calories += 20;
-    }
-    if (this.filling == 'cheese') {
-      cost += 10;
-      calories += 20;
-    } else if (this.filling == 'salad') {
-      cost += 20;
-      calories += 5;
-    } else {
-      cost += 15;
-      calories += 10;
-    }
-    if (this.seasoning) {
-      cost += 15;
-    }
-    if (this.mayonnaise) {
-      cost += 20;
-      calories += 5;
-    }
-    console.log(`Вы взяли гамбургер стоимостью ${cost} руб. и калорийностью ${calories} калорий`);
+
+  render() {
+    return ` <ul class="cart-popup__list">
+              <li class="cart-popup__list-item" data-id="${this.id}">
+                <img src="${this.img}" alt="Изображение товара">
+              </li>
+              <li class="cart-popup__list-item">${this.title}</li>
+              <li class="cart-popup__list-item">${this.price} руб.</li>
+              <li class="cart-popup__list-item">${this.quantity}</li>
+              <li class="cart-popup__list-item">${this.price * this.quantity} руб.</li>
+              <li class="cart-popup__list-item cart-popup__list-item--delete" title="Удалить товар">
+                <img class="cart-popup__delete" src="img/delete-from-cart.ico" alt="Удалить товар">
+              </li>
+            </ul>`;
   }
+
+  increaseProductQuantity() {} // Увеличить количество товара
+
+  reduceProductQuantity() {} // Уменьшить количество товара
+
+
+  recalculateAmountOfProduct() {} // Пересчитать сумму товара, в зависимости от количества
+
 }
 
-let hamburger1 = new Hamburger('big', 'cheese', true, false);
-hamburger1.calc();
-let hamburger2 = new Hamburger('big', 'salad', true, true);
-hamburger2.calc();
-let hamburger3 = new Hamburger('small', 'salad', false, true);
-hamburger3.calc();
+let cartList = new CartList();
+
+
 
 
 
